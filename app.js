@@ -1,49 +1,43 @@
-
-
+// BUDGET CONTROLLER
 var budgetController = (function() {
-    
-    var x = 23;
-    var add = function(a) {
-        return x + a; 
-    }
-
-    return {
-        publicTest: function(b) {
-            return add(b);
-        } 
-    }
-
+    // Some code
 })();
 
 
-
+// UI CONTROLLER
 var UIController = (function() {
-
-    // code goes here
-
+    //code goes here
 })();
 
-    
-/* 
-the two modules above are completely separate and there will never be interaction, because they need to be independant. If we wanted to create a more complex budget app, we can take the budget controller module and expand it, and not have to think of the UI controller. This is called SEPARATION OF CONCERNS.
 
-But we need a way for them to connect, for example to read data from the UI, and add the data as a new expense in the budgetController, so we create the module below: 
-*/
-
+// GLOBAL APP CONTROLLER
 var controller = (function(budgetCtrl, UICtrl) {
 
-    var z = budgetCtrl.publicTest(5);
 
-    return {
-        anotherPublic: function() {
-            console.log(z);
-        }
+    var ctrlAddItem = function() {
+        // this function will need to: 
+        // 1. Get the field input data
+        // 2. Add the item to the budget controller
+        // 3. Add the new item to the UI
+        // 4. Calculate the budget
+        // 5. Display the budget on the UI
+        console.log('test');
     }
 
 
+
+    /* event listener for clicking the add button. We can get rid of the anonymous function, because we can now pass in the functionw defined above, ctrlAddItem,  as an argument: */
+    document.querySelector('.add__btn').addEventListener('click', ctrlAddItem);
+
+
+
+    /* event listener for hitting enter (we don't need a query selector because it's global, rather than for a certain element). 
+    'keypress' event is for ANY key, so we need to put an if statement so it only works if enter is pressed. 13 is the keycode for ENTER... some browsers use 'which' instead of keycode - so we add the 'or'
+    */
+    document.addEventListener('keypress', function(event) {
+        if (event.keyCode === 13 || event.which === 13) {
+            ctrlAddItem();
+        }        
+    });
+
 })(budgetController, UIController);
-
-/* we pass the other two modules as arguments, so that it knows about the other two modules and can connect them. In the above, we assign two arguments, and then when we immediately call the function, we use the other two modules as the arguments (for budgetCtrl, and UICtrl) -- they can technically be named the same thing. 
-
-controller module has test data that will show '28' if we do 'controller.anotherPublic();' on the console. 
-*/
