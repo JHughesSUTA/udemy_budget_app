@@ -24,30 +24,29 @@ var budgetController = (function() {
         }
     }
 
-    //create a public method that will allow other modules to add a new item to our data structure
-    return {                // will contain all our public methods
+    return {    // will contain all our public methods
         addItem: function(type, des, val) {
             var newItem, ID;
 
             // create new id ()
             if (data.allItems[type].length > 0) {
-                ID = data.allItems[type][data.allItems[type].length - 1].id + 1;    // makes the id = the id of the last entry + 1
+                ID = data.allItems[type][data.allItems[type].length - 1].id + 1;
             } else {
                 ID = 0;
             }
 
             // create new item based on 'inc' or 'exp' type
-            if (type === 'exp') {                           // input type in getInput will be either exp or inc
+            if (type === 'exp') {
                 newItem = new Expense(ID, des, val);
             } else if (type === 'inc') {
                 newItem = new Income(ID, des, val);
             }
 
             // push it into our data structure
-            data.allItems[type].push(newItem);   // adds the new element to the array either exp or inc from above
+            data.allItems[type].push(newItem);
 
             // return the new element
-            return newItem; // the other function that will call this one will have access to item we just created
+            return newItem;
 
         },
 
@@ -69,8 +68,8 @@ var UIController = (function() {
         inputDescription: '.add__description',
         inputValue: '.add__value',
         inputBtn: '.add__btn',
-        incomeContainer: '.income__list',       // element we want to select if we have income
-        expensesContainer: '.expenses__list'      // element we want to select if we have expense
+        incomeContainer: '.income__list',
+        expensesContainer: '.expenses__list'
     }
     
     return {
@@ -98,13 +97,32 @@ var UIController = (function() {
             }
 
             // Replace placeholder text with actual data
-            newHtml = html.replace('%id%', obj.id);   // replace the placeholder text in above html with the id from the function constructor
+            newHtml = html.replace('%id%', obj.id);
             newHtml = newHtml.replace('%description%', obj.description);
             newHtml = newHtml.replace('%value%', obj.value);
 
 
             // Insert the HTML into the DOM
-            document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);  // 'beforeend' comes from insertAdjacentHTML method, look at documentation
+            document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+        },
+
+        //public method for clearing fields
+        clearFields: function() {
+            var fields, fieldsArr;
+
+            fields = document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue);
+            // querySelectorAll returns a list... so we need to convert to an array with slice and using the call method.
+
+            fieldsArr = Array.prototype.slice.call(fields);     // this will trick slice method into thinking we gave it an array, assigns the resulting array to the variable
+
+            // we pass a callback function into the forEach method, and the callback function is supplied to each of the elements in the array
+            // callback function can receive up to three arguments
+            // we have access to three thigns: current value, index, and the array
+            fieldsArr.forEach(function(current, index, array){          // you can name the arguments anything
+                current.value = "";         // sets the value for each element in array to an empty string
+
+            fieldsArr[0].focus(); // sets focus back to description field
+            });
         },
 
         getDOMstrings: function() {
@@ -148,11 +166,13 @@ var controller = (function(budgetCtrl, UICtrl) {
         newItem = budgetCtrl.addItem(input.type, input.description, input.value);
 
         // 3. Add the new item to the UI
-        UICtrl.addListItem(newItem, input.type); // call addListItem method
+        UICtrl.addListItem(newItem, input.type);
 
-        // 4. Calculate the budget
+        // 4. Clear the fields
+        UICtrl.clearFields();   // call clearFields method
+        // 5. Calculate the budget
 
-        // 5. Display the budget on the UI
+        // 6. Display the budget on the UI
     };
 
     return  {
