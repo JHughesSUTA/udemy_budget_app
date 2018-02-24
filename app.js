@@ -13,6 +13,15 @@ var budgetController = (function() {
         this.value = value;
     };
 
+    // created here because we want this part to be private
+    var calculateTotal = function(type) {
+        var sum = 0;
+        data.allItems[type].forEach(function(cur) {
+            sum += cur.value;
+        });
+        data.totals[type] = sum;        // stores the sum in our data structure
+    };
+
     var data = {
         allItems: {
             exp: [],
@@ -21,7 +30,9 @@ var budgetController = (function() {
         totals: {
             exp: 0,
             inc: 0
-        }
+        },
+        budget: 0,
+        percentage: -1      // -1 usually used to say that something is non-existant
     }
 
     return {    // will contain all our public methods
@@ -50,9 +61,36 @@ var budgetController = (function() {
 
         },
 
+        calculateBudget: function() {
+
+            // calculate total income and expenses
+            calculateTotal('exp');      // calls the private function
+            calculateTotal('inc');
+
+            // calculate the budget: income - expenses
+            data.budget = data.totals.inc - data.totals.exp;  // stores the budget in the data structure
+
+            // calculate the percentage of income that we've spent
+            if (data.totals.inc > 0) {          // only sets percentage if there is income
+                data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
+            } else {
+                data.percentage = -1;
+            }
+        },
+
         testing: function() {               // testing to see in console
             console.log(data);
+        },
+
+        getBudget: function() {
+            return {
+                budget: data.budget,
+                totalInc: data.totals.inc,
+                totalExp: data.totals.exp,
+                percentage: data.percentage
+            };
         }
+
     };
 
 })();
@@ -77,7 +115,7 @@ var UIController = (function() {
             return {
                 type: document.querySelector(DOMstrings.inputType).value,
                 description: document.querySelector(DOMstrings.inputDescription).value,
-                value: parseFloat(document.querySelector(DOMstrings.inputValue).value)      // parseFloat converts a string to a float
+                value: parseFloat(document.querySelector(DOMstrings.inputValue).value)
             };
         },
 
@@ -152,24 +190,24 @@ var controller = (function(budgetCtrl, UICtrl) {
 
 
     var updateBudget = function() {
+
         // 1. Calculate the budget
+        budgetCtrl.calculateBudget();
 
         // 2. Return the budget
+        var budget = budgetCtrl.getBudget();    // have to use a variable because getBudget method returns something
 
         // 3. Display the budget on the UI
-
+        console.log(budget);            // this is unfinished
     };
 
 
     var ctrlAddItem = function() {
         var input, newItem;
 
-        // this function will need to: 
         // 1. Get the field input data
         input = UICtrl.getInput();
 
-        // validate input fields with if statement
-        // (isNaN (Not a Number) = JavaScript method to check if something is not a number)
         if (input.description !== "" && !isNaN(input.value) && input.value > 0) { 
             // 2. Add the item to the budget controller
             newItem = budgetCtrl.addItem(input.type, input.description, input.value);
