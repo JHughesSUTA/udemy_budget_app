@@ -77,7 +77,7 @@ var UIController = (function() {
             return {
                 type: document.querySelector(DOMstrings.inputType).value,
                 description: document.querySelector(DOMstrings.inputDescription).value,
-                value: document.querySelector(DOMstrings.inputValue).value
+                value: parseFloat(document.querySelector(DOMstrings.inputValue).value)      // parseFloat converts a string to a float
             };
         },
 
@@ -111,17 +111,13 @@ var UIController = (function() {
             var fields, fieldsArr;
 
             fields = document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue);
-            // querySelectorAll returns a list... so we need to convert to an array with slice and using the call method.
 
-            fieldsArr = Array.prototype.slice.call(fields);     // this will trick slice method into thinking we gave it an array, assigns the resulting array to the variable
+            fieldsArr = Array.prototype.slice.call(fields);
 
-            // we pass a callback function into the forEach method, and the callback function is supplied to each of the elements in the array
-            // callback function can receive up to three arguments
-            // we have access to three thigns: current value, index, and the array
-            fieldsArr.forEach(function(current, index, array){          // you can name the arguments anything
-                current.value = "";         // sets the value for each element in array to an empty string
+            fieldsArr.forEach(function(current, index, array){
+                current.value = "";
 
-            fieldsArr[0].focus(); // sets focus back to description field
+                fieldsArr[0].focus();
             });
         },
 
@@ -155,6 +151,16 @@ var controller = (function(budgetCtrl, UICtrl) {
     };
 
 
+    var updateBudget = function() {
+        // 1. Calculate the budget
+
+        // 2. Return the budget
+
+        // 3. Display the budget on the UI
+
+    };
+
+
     var ctrlAddItem = function() {
         var input, newItem;
 
@@ -162,17 +168,21 @@ var controller = (function(budgetCtrl, UICtrl) {
         // 1. Get the field input data
         input = UICtrl.getInput();
 
-        // 2. Add the item to the budget controller
-        newItem = budgetCtrl.addItem(input.type, input.description, input.value);
+        // validate input fields with if statement
+        // (isNaN (Not a Number) = JavaScript method to check if something is not a number)
+        if (input.description !== "" && !isNaN(input.value) && input.value > 0) { 
+            // 2. Add the item to the budget controller
+            newItem = budgetCtrl.addItem(input.type, input.description, input.value);
 
-        // 3. Add the new item to the UI
-        UICtrl.addListItem(newItem, input.type);
+            // 3. Add the new item to the UI
+            UICtrl.addListItem(newItem, input.type);
 
-        // 4. Clear the fields
-        UICtrl.clearFields();   // call clearFields method
-        // 5. Calculate the budget
+            // 4. Clear the fields
+            UICtrl.clearFields();   // call clearFields method
 
-        // 6. Display the budget on the UI
+            // 5. Calculate and update budget
+            updateBudget();
+        } 
     };
 
     return  {
