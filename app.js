@@ -19,7 +19,7 @@ var budgetController = (function() {
         data.allItems[type].forEach(function(cur) {
             sum += cur.value;
         });
-        data.totals[type] = sum;        // stores the sum in our data structure
+        data.totals[type] = sum;
     };
 
     var data = {
@@ -32,7 +32,7 @@ var budgetController = (function() {
             inc: 0
         },
         budget: 0,
-        percentage: -1      // -1 usually used to say that something is non-existant
+        percentage: -1
     }
 
     return {    // will contain all our public methods
@@ -64,14 +64,14 @@ var budgetController = (function() {
         calculateBudget: function() {
 
             // calculate total income and expenses
-            calculateTotal('exp');      // calls the private function
+            calculateTotal('exp');
             calculateTotal('inc');
 
             // calculate the budget: income - expenses
-            data.budget = data.totals.inc - data.totals.exp;  // stores the budget in the data structure
+            data.budget = data.totals.inc - data.totals.exp;
 
             // calculate the percentage of income that we've spent
-            if (data.totals.inc > 0) {          // only sets percentage if there is income
+            if (data.totals.inc > 0) {
                 data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
             } else {
                 data.percentage = -1;
@@ -107,7 +107,11 @@ var UIController = (function() {
         inputValue: '.add__value',
         inputBtn: '.add__btn',
         incomeContainer: '.income__list',
-        expensesContainer: '.expenses__list'
+        expensesContainer: '.expenses__list',
+        budgetLabel: '.budget__value',
+        incomeLabel: '.budget__income--value',
+        expensesLabel: '.budget__expenses--value',
+        percentageLabel: '.budget__expenses--percentage'
     }
     
     return {
@@ -159,6 +163,18 @@ var UIController = (function() {
             });
         },
 
+        displayBudget: function(obj) {
+            document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget;    // this is all comeing from getBudget
+            document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalInc;
+            document.querySelector(DOMstrings.expensesLabel).textContent = obj.totalExp;
+
+            if (obj.percentage > 0) {   // will only show percentage if it's more than 0
+                document.querySelector(DOMstrings.percentageLabel).textContent = obj.percentage + '%';
+            } else {
+                document.querySelector(DOMstrings.percentageLabel).textContent = '---';
+            }
+        },
+
         getDOMstrings: function() {
             return DOMstrings;
         }
@@ -195,10 +211,10 @@ var controller = (function(budgetCtrl, UICtrl) {
         budgetCtrl.calculateBudget();
 
         // 2. Return the budget
-        var budget = budgetCtrl.getBudget();    // have to use a variable because getBudget method returns something
+        var budget = budgetCtrl.getBudget();
 
         // 3. Display the budget on the UI
-        console.log(budget);            // this is unfinished
+        UICtrl.displayBudget(budget);   // call the returned budget object as the argument
     };
 
 
@@ -216,7 +232,7 @@ var controller = (function(budgetCtrl, UICtrl) {
             UICtrl.addListItem(newItem, input.type);
 
             // 4. Clear the fields
-            UICtrl.clearFields();   // call clearFields method
+            UICtrl.clearFields();
 
             // 5. Calculate and update budget
             updateBudget();
@@ -225,6 +241,13 @@ var controller = (function(budgetCtrl, UICtrl) {
 
     return  {
         init: function() {
+            UICtrl.displayBudget({      // calls the displayBudget with defaults set to 0 when app loads
+                budget: 0,
+                totalInc: 0,
+                totalExp: 0,
+                percentage: -1
+            });
+
             setupEventListeners();
         }
     };
