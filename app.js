@@ -61,6 +61,24 @@ var budgetController = (function() {
 
         },
 
+        deleteItem: function(type, id) {
+            var ids, index;
+
+            // create an array with all the id numbers that we have:
+            // map also receives a callback function that has access to current element, current index and entire array
+            // difference between map and forEach is that map returns a brand new array
+            ids = data.allItems[type].map(function(current) {
+                return current.id;
+            });
+
+            // find the index the id we are looking for 
+            index = ids.indexOf(id);  // will return -1 if it is not in the array
+
+            if (index !== -1) {
+                data.allItems[type].splice(index, 1); // splice(position number, # of elements we want to delete)
+            }
+        },
+
         calculateBudget: function() {
 
             // calculate total income and expenses
@@ -251,15 +269,15 @@ var controller = (function(budgetCtrl, UICtrl) {
     var ctrlDeleteItem = function(event) {          // 'event' argument needed so we know the target element, callback function of addEventListener always has access to the event object. comes from setupEventListeners in this case
         var itemID, splitID, type, ID;
 
-        itemID = console.log(event.target.parentNode.parentNode.parentNode.parentNode.id);      // parentNode needed for DOM Traversal
+        itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;      // parentNode needed for DOM Traversal
 
-        if itemID() {           // no 'id's used anywhere else on the app, so if there's an ID they would have clicked the 'x'
+        if (itemID) {           // no 'id's used anywhere else on the app, so if there's an ID they would have clicked the 'x'
             splitID = itemID.split('-');     // splits the id to an array ('id-1' = [id, 1])x
             type = splitID[0];
-            ID = splitID[1];
+            ID = parseInt(splitID[1]);      // get the ID and convert it to an integer
 
             // 1. Delete Item from the data structure
-
+            budgetCtrl.deleteItem(type, ID);
             // 2. Delete Item from UI
 
             // 3. Updatate and show new budget
