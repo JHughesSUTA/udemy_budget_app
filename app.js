@@ -167,6 +167,12 @@ var UIController = (function() {
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
         },
 
+        deleteListItem: function(selectorID) {  // selectorID comes from itemID in 'ctrlDeleteItem'
+            var el = document.getElementById(selectorID);
+            // JS only lets us remove a child element, so we need to go up to the parent and then remove the child element from there
+            el.parentNode.removeChild(el); 
+        },
+
         //public method for clearing fields
         clearFields: function() {
             var fields, fieldsArr;
@@ -278,9 +284,12 @@ var controller = (function(budgetCtrl, UICtrl) {
 
             // 1. Delete Item from the data structure
             budgetCtrl.deleteItem(type, ID);
+            
             // 2. Delete Item from UI
+            UICtrl.deleteListItem(itemID);
 
             // 3. Updatate and show new budget
+            updateBudget();
         }
 
     };
