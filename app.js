@@ -162,7 +162,8 @@ var UIController = (function() {
         incomeLabel: '.budget__income--value',
         expensesLabel: '.budget__expenses--value',
         percentageLabel: '.budget__expenses--percentage',
-        container: '.container'
+        container: '.container',
+        expensesPercLabel: '.item__percentage',
     }
     
     return {
@@ -232,6 +233,26 @@ var UIController = (function() {
             }
         },
 
+         displayPercentages: function(percentages) {    // percentages argument is the percentage array that we have stored in the app controller
+            // querySelectorAll in order to grab all of them rather than just the first, with 'querySelector'
+            var fields = document.querySelectorAll(DOMstrings.expensesPercLabel);   // this returns a 'node list' which can be iterated through
+
+            var nodeListForEach = function(list, callback) {  // receives a node list and callback function
+                for (var i = 0; i < list.length; i++) {        // simply a for loop that calls the callback function with each iteration
+                    callback(list[i], i);     // (list[i], i) = (current, index): this passes the parameters into the callback function          
+                }
+            };
+
+            nodeListForEach(fields, function(current, index) {      // use callback function with 'current, index', just like forEach but this time for a list
+                if (percentages[index] > 0) {
+                    current.textContent = percentages[index] + '%';
+                } else {
+                    current.textContent = '---';
+                }
+            });
+
+         },
+
         getDOMstrings: function() {
             return DOMstrings;
         }
@@ -289,7 +310,7 @@ var controller = (function(budgetCtrl, UICtrl) {
         var percentages = budgetCtrl.getPercentages();
 
         // 3. Update the user interface with new percentages
-        console.log(percentages);
+        UICtrl.displayPercentages(percentages);     // 'percentages' comes from step 2 above
     };
 
 
