@@ -164,6 +164,7 @@ var UIController = (function() {
         percentageLabel: '.budget__expenses--percentage',
         container: '.container',
         expensesPercLabel: '.item__percentage',
+        dateLabel: '.budget__title--month'
     }
 
     var formatNumber = function(num, type) {
@@ -273,8 +274,20 @@ var UIController = (function() {
                     current.textContent = '---';
                 }
             });
-
         },   
+
+        displayMonth: function() {
+            var now, month, months, year; 
+            now = new Date();   // if we don't pass anything in, it will return todays date
+            // var christmas = new Date(2018, 11, 25)  -- this would return christmas of this year, month is '0' based
+            months = ['January', 'February', 'March', 'April', 'May',
+                    'June', 'July', 'August', 'September', 'October',
+                    'November', 'December']
+                    
+            month = now.getMonth();
+            year = now.getFullYear();     // 'getFullYear' will return the year
+            document.querySelector(DOMstrings.dateLabel).textContent = months[month] + ' ' +  year;
+        },
 
         getDOMstrings: function() {
             return DOMstrings;
@@ -392,6 +405,7 @@ var controller = (function(budgetCtrl, UICtrl) {
 
     return  {
         init: function() {
+            UICtrl.displayMonth();
             UICtrl.displayBudget({
                 budget: 0,
                 totalInc: 0,
