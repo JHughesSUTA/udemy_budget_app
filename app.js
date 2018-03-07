@@ -184,6 +184,13 @@ var UIController = (function() {
         // type === 'exp' ? sign = '-' : sign = '+'
         return (type === 'exp' ? '-' : '+') + ' ' + int + '.' + dec;
     };
+
+    // moved here to make it accessible to other methods in this controller
+    var nodeListForEach = function(list, callback) {  // receives a node list and callback function
+        for (var i = 0; i < list.length; i++) {        // simply a for loop that calls the callback function with each iteration
+            callback(list[i], i);     // (list[i], i) = (current, index): this passes the parameters into the callback function          
+        }
+    };  
     
     return {
         getInput: function(){
@@ -261,12 +268,6 @@ var UIController = (function() {
             // querySelectorAll in order to grab all of them rather than just the first, with 'querySelector'
             var fields = document.querySelectorAll(DOMstrings.expensesPercLabel);   // this returns a 'node list' which can be iterated through
 
-            var nodeListForEach = function(list, callback) {  // receives a node list and callback function
-                for (var i = 0; i < list.length; i++) {        // simply a for loop that calls the callback function with each iteration
-                    callback(list[i], i);     // (list[i], i) = (current, index): this passes the parameters into the callback function          
-                }
-            };
-
             nodeListForEach(fields, function(current, index) {      // use callback function with 'current, index', just like forEach but this time for a list
                 if (percentages[index] > 0) {
                     current.textContent = percentages[index] + '%';
@@ -283,10 +284,25 @@ var UIController = (function() {
             months = ['January', 'February', 'March', 'April', 'May',
                     'June', 'July', 'August', 'September', 'October',
                     'November', 'December']
-                    
+
             month = now.getMonth();
             year = now.getFullYear();     // 'getFullYear' will return the year
             document.querySelector(DOMstrings.dateLabel).textContent = months[month] + ' ' +  year;
+        },
+
+        changedType: function() {
+            var fields;
+            fields = document.querySelectorAll(         // this returns a node list
+                DOMstrings.inputType + ',' +
+                DOMstrings.inputDescription + ',' +
+                DOMstrings.inputValue
+            );
+
+            nodeListForEach(fields, function(cur) {
+                cur.classList.toggle('red-focus');          // will toggle the 'red-focus' css class 
+            });
+
+            document.querySelector(DOMstrings.inputBtn).classList.toggle('red');    // changes check icon to red when expense selected
         },
 
         getDOMstrings: function() {
@@ -321,7 +337,9 @@ var controller = (function(budgetCtrl, UICtrl) {
         Since we want the handler to handle any of the buttons selected, we use event delagation
         and select the first common parent element 'container'
         */
-        document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem); 
+        document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem);
+
+        document.querySelector(DOM.inputType).addEventListener('change', UICtrl.changedType);
     };
 
 
